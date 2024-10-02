@@ -11,7 +11,7 @@ public class KinematicsEngine {
         KinematicsEngine kinematicsEngine = new KinematicsEngine();
         kinematicsEngine.registerValues();
         kinematicsEngine.initializeObjects();
-        for (int i = 0; i <= 50; i++) {
+        for (int i = 0; i <= 5000; i++) {
             kinematicsEngine.runTick();
         }
     }
@@ -89,7 +89,7 @@ public class KinematicsEngine {
         double proposedVelocity = object.instantaneousVelocity + GRAVITY_ACCELERATION_BY_TIME;
 
         // 3 displacement (might have to rework for bouncing)
-        double proposedDisplacement = ((proposedVelocity) / 2.0) * (timeElapsed);
+        double proposedDisplacement = ((proposedVelocity) / 2.0) * timeElapsed;
 
 
 //        proposedVelocity = Math.round(proposedVelocity * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);

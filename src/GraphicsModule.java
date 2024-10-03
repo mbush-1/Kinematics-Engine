@@ -21,6 +21,7 @@ public class GraphicsModule {
     }
 
     void initializeViews() {
+
         frame = new JFrame("KinematicsEngine");
         frame.setSize(750, 500);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -78,7 +79,10 @@ public class GraphicsModule {
                 // Check if both input fields are not empty and that inputs are valid
                 data.setStartHeight(Double.parseDouble(heightInput.getText()));
                 data.setTimePrecision(Integer.parseInt(timePrecisionInput.getText()));
-                openSimulationTracker();
+
+                if (tF == null) {
+                    openSimulationTracker();
+                }
 
                 new Thread(() -> {
                     try {
@@ -92,13 +96,24 @@ public class GraphicsModule {
             }
         });
 
-                // Open the simulation tracker window
+        JButton resetButton = new JButton("RESET SIMULATION");
+        resetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                data.resetSimulation();
+                resetSimulationTracker();
+            }
+        });
+
+
+        // Open the simulation tracker window
 
 
                 // If user wants to restart the simulation
 
         // Add the button to the frame
         frame.add(runButton, gbc);
+        frame.add(resetButton);
 
         // Make the main frame visible
         frame.setVisible(true);
@@ -133,9 +148,20 @@ public class GraphicsModule {
         tF.setVisible(true);
     }
 
-    void updateSimulationTracker(double height, double time, double velocity) {
-        heightValue.setText(height + "m");
-        timeValue.setText(time + "s");
-        velocityValue.setText(velocity  + "m/s");
+    void updateSimulationTracker() {
+
+        // TODO remove parameters and access through class methods
+        heightValue.setText(data.getDisplayHeight() + "m");
+        timeValue.setText(data.getTimeElapsed() + "s");
+        velocityValue.setText(data.getDisplayVelocity()  + "m/s");
     }
+
+    void resetSimulationTracker() {
+
+        // TODO remove parameters and access through class methods
+        heightValue.setText(data.startHeight + "m");
+        timeValue.setText(0.0 + "s");
+        velocityValue.setText(0.0  + "m/s");
+    }
+
 }

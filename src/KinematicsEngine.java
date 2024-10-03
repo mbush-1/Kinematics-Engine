@@ -11,8 +11,14 @@ public class KinematicsEngine {
     static final int TEXT = 0;
     static final int GUI = 1;
 
+    // engine mode
+    static final int GRAVITY_DROP = 0;
+    static final int CAR_SIMULATOR = 1;
+    int engineMode;
+
     // main functionality vars
     Object object;
+    double displayHeight, displayVelocity;
     boolean runningEngine;
     int entryUI;
 
@@ -26,6 +32,20 @@ public class KinematicsEngine {
     // inputs
     double startHeight;
     int timePrecision;
+
+    KinematicsEngine(int engineMode) {
+        this.engineMode = engineMode;
+    }
+
+//    void startPhysicsEngine() {
+//        if (CAR_SIMULATOR) {
+//            ;
+//        }
+//        else {
+//            runCarSimulator();
+//        }
+//
+//    }
 
 
     // equivalent of the "main" - runs the gravity simulator
@@ -63,7 +83,7 @@ public class KinematicsEngine {
                     object.displacement = -startHeight;
                     printValues();
                     System.out.println("GROUND CONTACT!");
-                    resetSimulation();
+//                    resetSimulation();
                     runningEngine = false;
                 }
 
@@ -71,15 +91,24 @@ public class KinematicsEngine {
                     printValues();
                 }
                 else {
-                    Main.graphicsModule.updateSimulationTracker(Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision),
-                            timeElapsed,
-                            Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision));
+                    displayHeight = Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
+                    displayVelocity = Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
+                    Main.graphicsModule.updateSimulationTracker();
                 }
 
             }
 
 
         }
+    }
+
+    // assume text based only
+    void runCarSimulator()  {
+        // open pedal ui - thread may be needed
+
+        // custom tick
+
+
     }
 
     // [BEHAVIOURS]
@@ -164,16 +193,27 @@ public class KinematicsEngine {
         tick = 0;
     }
 
+    public double getDisplayHeight() {
+        return displayHeight;
+    }
+
+    public double getDisplayVelocity() {
+        return displayVelocity;
+    }
+
+    public double getTimeElapsed() {
+        return timeElapsed;
+    }
+
     void printValues() {
         if (entryUI == TEXT) {
             System.out.println(
                     "TICK: " + tick + " | ELAPSED TIME: " + timeElapsed + " | VELOCITY: " + Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + " | HEIGHT: "  + Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + "|"
             );        }
         else {
-            // ! TIME
-            Main.graphicsModule.updateSimulationTracker(Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision),
-                    timeElapsed,
-                    Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision));
+            displayHeight = Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
+            displayVelocity = Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
+            Main.graphicsModule.updateSimulationTracker();
         }
 
 

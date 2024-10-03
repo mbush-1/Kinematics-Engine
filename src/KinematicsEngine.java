@@ -1,38 +1,88 @@
+// [IMPORTS]
 import java.util.Scanner;
 
+/** KINEMATICS ENGINE - holds and calculates all data. **/
 public class KinematicsEngine {
-
-    int tick;
-    double timeElapsed; // in s
-    Object object;
-
-    // "main"
-    static void runSimulator() {
-        KinematicsEngine kinematicsEngine = new KinematicsEngine();
-        kinematicsEngine.registerValues();
-        kinematicsEngine.initializeObjects();
-        while (true) {
-            kinematicsEngine.runTick();
-
-            if ((kinematicsEngine.object.displacement + kinematicsEngine.startHeight) < 0) {
-                kinematicsEngine.object.displacement = -kinematicsEngine.startHeight;
-                kinematicsEngine.printValues();
-                break;
-            }
-        }
-    }
 
     // [FIELDS]
 
-    static Scanner userInput;
+    // static access for readability / usage
+    static Scanner userInput = new Scanner(System.in);
+    static final int TEXT = 0;
+    static final int GUI = 1;
+
+    // main functionality vars
+    Object object;
+    boolean runningEngine;
+    int entryUI;
+
+    // time-incrementation system variables
+    int tick;
+    double timeElapsed; // in s
+
+    // physics-based constant
     final double GRAVITY = -9.80665;
+
+    // inputs
     double startHeight;
     int timePrecision;
+
+
+    // equivalent of the "main" - runs the gravity simulator
+    void runGravitySimulator(int callFrom) throws InterruptedException {
+
+        entryUI = callFrom;
+
+        // have to register values in console if entry call is from console
+        if (entryUI == TEXT) {
+            registerValues();
+        }
+
+        // use given values to make object
+        object = new Object();
+
+        // make constant for time (if user wants real-time generation) TODO: MAKE THIS AN OPTIONAL THING
+        final long tickTimingInterval = (long) (1000.0 / Math.pow(10, timePrecision));
+
+        // activate gravity engine
+        runningEngine = true;
+
+        while (true) {
+            // Wait for the specified time interval
+            if (runningEngine) {
+
+                try {
+                    Thread.sleep(tickTimingInterval);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restore interrupted status
+                }
+
+                runTick();
+
+                if ((object.displacement + startHeight) < 0) {
+                    object.displacement = -startHeight;
+                    printValues();
+                    System.out.println("GROUND CONTACT!");
+                    runningEngine = false;
+                }
+
+                if (entryUI == TEXT) {
+                    printValues();
+                }
+                else {
+                    Main.graphicsModule.updateSimulationTracker(Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision),
+                            Math.round(((timeElapsed) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision)),
+                            Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision));
+                }
+            }
+
+
+        }
+    }
 
     // [BEHAVIOURS]
 
     void registerValues() {
-        userInput = new Scanner(System.in);
 
         // Start height
         while (true) {
@@ -74,16 +124,6 @@ public class KinematicsEngine {
 
     }
 
-    void initializeObjects() {
-        object = new Ball(startHeight);
-    }
-
-    void simulateGravity() {
-        while (true) {
-
-        }
-    }
-
     void runTick() {
 
         // 1 time
@@ -100,9 +140,26 @@ public class KinematicsEngine {
         // check if d<=0
         object.instantaneousVelocity = proposedVelocity;
         object.displacement = proposedDisplacement;
-        printValues();
 
 
+    }
+
+    void toggleSimulation() {
+        runningEngine = !runningEngine;
+    }
+
+    public void setStartHeight(double startHeight) {
+        this.startHeight = startHeight;
+    }
+
+    public void setTimePrecision(int timePrecision) {
+        this.timePrecision = timePrecision;
+    }
+
+    void resetSimulation() {
+        object.resetValues();
+        timeElapsed = 0.0;
+        tick = 0;
     }
 
     void printValues() {

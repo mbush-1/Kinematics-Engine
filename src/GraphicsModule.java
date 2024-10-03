@@ -1,14 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class GraphicsModule {
-    boolean runningEngine;
     JFrame frame;
-    JPanel panel;
+    KinematicsEngine data;
+    JTextField heightInput;
+    JTextField timePrecisionInput;
 
-    static void startGraphicsModule() {
-        GraphicsModule graphicsModule = new GraphicsModule();
-        graphicsModule.initializeViews();
+    // Fields for simulation tracking
+    JLabel heightValue;
+    JLabel timeValue;
+    JLabel velocityValue;
+    JFrame tF; // New JFrame for simulation tracker
+
+    void startGraphicsModule() {
+        data = Main.kinematicsEngine;
+        initializeViews();
     }
 
     void initializeViews() {
@@ -33,30 +42,101 @@ public class GraphicsModule {
         titlePanel.add(titleLabel);
         frame.add(titlePanel, gbc); // Add title panel
 
-        gbc.gridy = 1; // Move to the next row for the button panel
-        gbc.weighty = 1; // Allow the button panel to take more vertical space
+        gbc.gridy = 1; // Move to the next row for the input fields
+        gbc.weighty = 0; // Reset weight for input fields
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout()); // Use FlowLayout for button panel
+        // Input Panel
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new FlowLayout()); // Use FlowLayout for input panel
 
-        // Create buttons with larger font
-        JLabel height = new JLabel("HEIGHT:");
-        height.setFont(new Font("Arial", Font.BOLD, 20));
-        JTextField heightInput = new JTextField(8);
+        // Create input fields and labels with larger font
+        JLabel heightTag = new JLabel("HEIGHT:");
+        heightTag.setFont(new Font("Arial", Font.BOLD, 20));
+        heightInput = new JTextField(8);
+
+        JLabel timePrecisionTag = new JLabel("PRECISION:");
+        timePrecisionTag.setFont(new Font("Arial", Font.BOLD, 20));
+        timePrecisionInput = new JTextField(8);
+
+        // Add components to the input panel
+        inputPanel.add(heightTag);
+        inputPanel.add(heightInput);
+        inputPanel.add(timePrecisionTag);
+        inputPanel.add(timePrecisionInput);
+
+        // Add input panel to the frame
+        frame.add(inputPanel, gbc);
+
+        gbc.gridy = 2; // Move to the next row for the button
+        gbc.weighty = 0.5; // Allow the button to take some vertical space
+
+        // Button to run simulation
         JButton runButton = new JButton("RUN SIMULATION");
-        runButton.setFont(new Font("Arial", Font.BOLD, 20));
+        runButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Check if both input fields are not empty and that inputs are valid
+                data.setStartHeight(Double.parseDouble(heightInput.getText()));
+                data.setTimePrecision(Integer.parseInt(timePrecisionInput.getText()));
+                System.out.println("Opening the tracker!");
+                openSimulationTracker();
+
+                new Thread(() -> {
+                    try {
+                        data.runGravitySimulator(KinematicsEngine.GUI);
+                        data.resetSimulation();
+
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
+            }
+        });
+
+                // Open the simulation tracker window
 
 
-        // Add buttons to button panel
-        buttonPanel.add(runButton);
-        buttonPanel.add(height);
-        buttonPanel.add(heightInput);
+                // If user wants to restart the simulation
 
-        frame.add(buttonPanel, gbc); // Add button panel
+        // Add the button to the frame
+        frame.add(runButton, gbc);
 
-        // Make the frame visible
+        // Make the main frame visible
         frame.setVisible(true);
     }
 
+    void openSimulationTracker() {
+        tF = new JFrame("Simulation Tracker");
+        JPanel trackerFrame = new JPanel();
+        tF.setSize(300, 200);
+        tF.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        trackerFrame.setLayout(new GridLayout(3, 2)); // 3 rows, 2 columns
+
+        JLabel currentHeightLabel = new JLabel("Current Height: ");
+        heightValue = new JLabel(); // Placeholder for height value
+        JLabel currentTimeLabel = new JLabel("Current Time: ");
+        timeValue = new JLabel(); // Placeholder for time value
+        JLabel currentVelocityLabel = new JLabel("Current Velocity: ");
+        velocityValue = new JLabel(); // Placeholder for velocity value
+
+        // Add labels to the tracker frame
+        trackerFrame.add(currentHeightLabel);
+        trackerFrame.add(heightValue);
+        trackerFrame.add(currentTimeLabel);
+        trackerFrame.add(timeValue);
+        trackerFrame.add(currentVelocityLabel);
+        trackerFrame.add(velocityValue);
+
+
+        // Make the tracker frame visible
+        tF.add(trackerFrame);
+
+        tF.setVisible(true);
+    }
+
+    void updateSimulationTracker(double height, double time, double velocity) {
+        heightValue.setText(height + "m");
+        timeValue.setText(time + "s");
+        velocityValue.setText(velocity  + "m/s");
+    }
 }

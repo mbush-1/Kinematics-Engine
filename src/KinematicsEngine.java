@@ -11,8 +11,14 @@ public class KinematicsEngine {
         KinematicsEngine kinematicsEngine = new KinematicsEngine();
         kinematicsEngine.registerValues();
         kinematicsEngine.initializeObjects();
-        for (int i = 0; i <= 5000; i++) {
+        while (true) {
             kinematicsEngine.runTick();
+
+            if ((kinematicsEngine.object.displacement + kinematicsEngine.startHeight) < 0) {
+                kinematicsEngine.object.displacement = -kinematicsEngine.startHeight;
+                kinematicsEngine.printValues();
+                break;
+            }
         }
     }
 
@@ -91,23 +97,17 @@ public class KinematicsEngine {
         // 3 displacement (might have to rework for bouncing)
         double proposedDisplacement = ((proposedVelocity) / 2.0) * timeElapsed;
 
-
-//        proposedVelocity = Math.round(proposedVelocity * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
-//        proposedDisplacement = Math.round(proposedDisplacement * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision);
-
-
         // check if d<=0
-
         object.instantaneousVelocity = proposedVelocity;
         object.displacement = proposedDisplacement;
+//        printValues();
 
-        printValues();
 
     }
 
     void printValues() {
         System.out.println(
-                "TICK: " + tick + " | ELAPSED TIME: " + timeElapsed + " | VELOCITY: " + object.instantaneousVelocity + " | HEIGHT: "  + (object.displacement + startHeight ) + "|"
+                "TICK: " + tick + " | ELAPSED TIME: " + timeElapsed + " | VELOCITY: " + Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + " | HEIGHT: "  + Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + "|"
         );
     }
 }

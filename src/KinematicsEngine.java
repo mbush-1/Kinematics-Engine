@@ -100,7 +100,7 @@ public class KinematicsEngine {
         // check if d<=0
         object.instantaneousVelocity = proposedVelocity;
         object.displacement = proposedDisplacement;
-//        printValues();
+        printValues();
 
 
     }

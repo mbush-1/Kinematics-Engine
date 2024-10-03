@@ -63,6 +63,7 @@ public class KinematicsEngine {
                     object.displacement = -startHeight;
                     printValues();
                     System.out.println("GROUND CONTACT!");
+                    resetSimulation();
                     runningEngine = false;
                 }
 
@@ -71,9 +72,10 @@ public class KinematicsEngine {
                 }
                 else {
                     Main.graphicsModule.updateSimulationTracker(Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision),
-                            Math.round(((timeElapsed) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision)),
+                            timeElapsed,
                             Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision));
                 }
+
             }
 
 
@@ -163,8 +165,17 @@ public class KinematicsEngine {
     }
 
     void printValues() {
-        System.out.println(
-                "TICK: " + tick + " | ELAPSED TIME: " + timeElapsed + " | VELOCITY: " + Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + " | HEIGHT: "  + Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + "|"
-        );
+        if (entryUI == TEXT) {
+            System.out.println(
+                    "TICK: " + tick + " | ELAPSED TIME: " + timeElapsed + " | VELOCITY: " + Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + " | HEIGHT: "  + Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision) + "|"
+            );        }
+        else {
+            // ! TIME
+            Main.graphicsModule.updateSimulationTracker(Math.round((object.displacement + startHeight) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision),
+                    timeElapsed,
+                    Math.round((object.instantaneousVelocity) * Math.pow(10, timePrecision)) / Math.pow(10, timePrecision));
+        }
+
+
     }
 }

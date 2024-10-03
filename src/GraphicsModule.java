@@ -78,7 +78,6 @@ public class GraphicsModule {
                 // Check if both input fields are not empty and that inputs are valid
                 data.setStartHeight(Double.parseDouble(heightInput.getText()));
                 data.setTimePrecision(Integer.parseInt(timePrecisionInput.getText()));
-                System.out.println("Opening the tracker!");
                 openSimulationTracker();
 
                 new Thread(() -> {
